@@ -1,0 +1,39 @@
+import psycopg2
+import numpy as np
+import pandas as pd
+
+conn = psycopg2.connect(
+    host="localhost",
+    port=5432,
+    database="demo",
+    user="postgres",
+    password="Sunil@3092"
+)
+try:
+    # Create a cursor
+    cur = conn.cursor()
+
+    # Execute SQL queries
+    cur.execute("SELECT * FROM employees")
+    rows = cur.fetchall()
+
+    # Create a DataFrame from the fetched rows
+    columns = [desc[0] for desc in cur.description]
+    df = pd.DataFrame(rows, columns=columns)
+
+    # Print the DataFrame
+    print(df)
+    print(df.dtypes())
+
+    # Commit the transaction (if necessary)
+    conn.commit()
+
+except (Exception, psycopg2.DatabaseError) as error:
+    print("Error: ", error)
+    # Rollback the transaction in case of an error
+    conn.rollback()
+
+finally:
+    # Close the cursor and connection
+    cur.close()
+    conn.close()
